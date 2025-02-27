@@ -33,7 +33,7 @@ def process_urls_in_parallel(urls, max_workers=15):
     
     return real_urls
 
-def get_google_news_taiwan(max_news=15):
+def get_google_news_taiwan(max_news=10):
     """獲取Google News台灣版新聞"""
     news_list = []
     google_urls = []
@@ -69,75 +69,75 @@ def get_google_news_taiwan(max_news=15):
         finally:
             browser.close()
     
-    # 使用BeautifulSoup解析
-    soup = BeautifulSoup(html_content, "lxml")
-    
-    # 定位新聞文章
-    articles = soup.select("article")[:max_news]
-    logger.info(f"找到 {len(articles)} 個新聞")
-    
-    # 第一步：收集所有Google News URL
-    temp_results = []
-    for i, article in enumerate(articles[:max_news]):
-        try:
-            # 找標題 - 使用更精確的選擇器
-            title_link = article.select_one("a.gPFEn, a.DY5T1d")
-            if not title_link:
-                continue
-                
-            # 提取標題
-            title = title_link.text.strip()
-            
-            # 提取URL
-            href = title_link.get("href")
-            if href.startswith("./"):
-                url = f"https://news.google.com{href[1:]}"
-            elif href.startswith("/"):
-                url = f"https://news.google.com{href}"
-            else:
-                url = href
-                
-            # 收集需要重定向的URL
-            if "news.google.com" in url:
-                google_urls.append(url)
-            
-            # 添加到臨時結果
-            temp_results.append({
-                "title": title,
-                "google_url": url,
-            })
-            
-        except Exception as e:
-            logger.error(f"解析新聞 #{i} 時出錯: {e}")
-    
-    # 第二步：並行獲取所有重定向URL
-    if google_urls:
-        logger.info(f"開始並行處理 {len(google_urls)} 個URL重定向...")
-        start_time = time.time()
-        real_url_map = process_urls_in_parallel(google_urls,max_workers=15)
-        elapsed = time.time() - start_time
-        logger.info(f"URL重定向處理完成，耗時: {elapsed:.2f}秒")
-    else:
-        real_url_map = {}
-    
-    # 第三步：生成最終結果
-    for item in temp_results:
-        google_url = item["google_url"]
-        # 如果是Google News URL，使用重定向後的URL
-        real_url = real_url_map.get(google_url, google_url)
+        # 使用BeautifulSoup解析
+        soup = BeautifulSoup(html_content, "lxml")
         
-        news_list.append({
-            "title": item["title"],
-            "url": real_url,
-        })
+        # 定位新聞文章
+        articles = soup.select("article")[:max_news]
+        logger.info(f"找到 {len(articles)} 個新聞")
+        
+        # 第一步：收集所有Google News URL
+        temp_results = []
+        for i, article in enumerate(articles[:max_news]):
+            try:
+                # 找標題 - 使用更精確的選擇器
+                title_link = article.select_one("a.gPFEn, a.DY5T1d")
+                if not title_link:
+                    continue
+                    
+                # 提取標題
+                title = title_link.text.strip()
+                
+                # 提取URL
+                href = title_link.get("href")
+                if href.startswith("./"):
+                    url = f"https://news.google.com{href[1:]}"
+                elif href.startswith("/"):
+                    url = f"https://news.google.com{href}"
+                else:
+                    url = href
+                    
+                # 收集需要重定向的URL
+                if "news.google.com" in url:
+                    google_urls.append(url)
+                
+                # 添加到臨時結果
+                temp_results.append({
+                    "title": title,
+                    "google_url": url,
+                })
+                
+            except Exception as e:
+                logger.error(f"解析新聞 #{i} 時出錯: {e}")
+        
+        # 第二步：並行獲取所有重定向URL
+        if google_urls:
+            logger.info(f"開始並行處理 {len(google_urls)} 個URL重定向...")
+            start_time = time.time()
+            real_url_map = process_urls_in_parallel(google_urls,max_workers=15)
+            elapsed = time.time() - start_time
+            logger.info(f"URL重定向處理完成，耗時: {elapsed:.2f}秒")
+        else:
+            real_url_map = {}
+        
+        # 第三步：生成最終結果
+        for item in temp_results:
+            google_url = item["google_url"]
+            # 如果是Google News URL，使用重定向後的URL
+            real_url = real_url_map.get(google_url, google_url)
             
-    # 最後添加執行時間到結果中
-    elapsed = time.time() - start_time
-    logger.info(f"Google News抓取完成，共找到 {len(news_list)} 個新聞，耗時: {elapsed:.2f}秒")
-    
-    # 用一個特殊的字典格式封裝結果
-    return {
-        "news": news_list,
-        "execution_time": elapsed
-    }
+            news_list.append({
+                "title": item["title"],
+                "url": real_url,
+            })
+                
+        # 最後添加執行時間到結果中
+        elapsed = time.time() - start_time
+        logger.info(f"Google News抓取完成，共找到 {len(news_list)} 個新聞，耗時: {elapsed:.2f}秒")
+        
+        # 用一個特殊的字典格式封裝結果
+        return {
+            "news": news_list,
+            "execution_time": elapsed
+        }
 
