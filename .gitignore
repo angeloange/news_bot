@@ -1,0 +1,5 @@
+# ...existing code...
+venv/
+__pycache__/
+*.html
+*.db
