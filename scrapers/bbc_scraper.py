@@ -40,14 +40,8 @@ def get_bbc_trending_news():
             page.wait_for_selector("h2, .most-read, .most-watched", timeout=5000)
             logger.info(f"頁面載入完成，耗時: {time.time()-start_nav:.2f}秒")
             
-            # 保存完整的 HTML 供分析
-            html_content = page.content()
-            with open("bbc_complete.html", "w", encoding="utf-8") as f:
-                f.write(html_content)
-            logger.info("完整 HTML 已保存至 bbc_complete.html")
-            
-            # 尋找熱門區塊
-            logger.info("尋找熱門區塊...")
+            # 移除保存 HTML 文件的部分，在生產環境不需要
+            # logger.info("尋找熱門區塊...")
             
             # 爬取 Most watched - 使用與原始代碼相同的邏輯
             most_watched = _extract_section_playwright(page, "Most watched")
