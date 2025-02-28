@@ -1,17 +1,17 @@
-from flask import Flask, request, abort
-from linebot import LineBotApi, WebhookHandler
-from linebot.exceptions import InvalidSignatureError
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, 
-    QuickReply, QuickReplyButton, MessageAction
-)
+import traceback
 import os
-import logging
 import time
+import json
+import random
+import logging
+from flask import Flask, request, render_template, jsonify
 from dotenv import load_dotenv
-from utils.url_shortener import shorten_url, shorten_urls_in_parallel
-from utils.openai_helper import generate_toeic_question, get_random_toeic_article
 
+# 自定義模組
+from utils.url_shortener import shorten_urls_in_parallel
+from utils.openai_helper import translate_titles
+from scrapers.bbc_scraper import get_bbc_trending_news
+from scrapers.google_news_scraper import get_google_news_taiwan
 
 load_dotenv()
 
@@ -22,256 +22,263 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 導入爬蟲模組
-from scrapers.bbc_scraper import get_bbc_trending_news
-from scrapers.google_news_scraper import get_google_news_taiwan  # 添加這行
-
+# 創建 Flask 應用
 app = Flask(__name__)
 
-# 設置 LINE Bot API
-line_bot_api = LineBotApi(os.getenv('LINE_CHANNEL_ACCESS_TOKEN' ))  # 請替換為你的token
-handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET') )  # 請替換為你的secret
+# 設置模板和靜態文件路徑
+app.template_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+app.static_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
-@app.route("/callback", methods=['POST'])
-def callback():
-    """LINE Bot Webhook 回調函數"""
-    # 獲取 X-Line-Signature 頭部值
-    signature = request.headers['X-Line-Signature']
-
-    # 獲取請求正文文本
-    body = request.get_data(as_text=True)
-    logger.info("Request body: " + body)
-
-    # 驗證簽名
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        logger.error("Invalid signature")
-        abort(400)
-
-    return 'OK'
-
+# 網頁主頁
 @app.route("/", methods=['GET'])
-def hello():
-    """提供簡單的首頁回應，用於檢查服務是否正常運行"""
-    return 'NewsCoach by Angelo - LINE Bot is running!'
+def web_interface():
+    """提供網頁界面"""
+    return render_template('index.html')
 
-@handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
-    """處理用戶發送的文字訊息"""
-    user_message = event.message.text.strip()
-    
-    # 主選單
-    if user_message.lower() in ["help", "menu", "選單", "幫助", "hi", "hello", "嗨", "你好"]:
-        show_main_menu(event.reply_token)
-    
-    # 處理BBC新聞請求
-    elif user_message.lower() in ["bbc", "國外新聞", "1"]:
-        send_bbc_news(event.reply_token)
-    
-    # 處理國內新聞請求 (使用 Google News)
-    elif user_message.lower() in ["國內新聞", "台灣新聞", "2"]:
-        send_google_news(event.reply_token)
-    
-    # 處理多益閱讀請求 (未實現)
-    elif user_message.lower() in ["多益", "toeic", "3","多益閱讀題目"]:
-        send_toeic_question(event.reply_token)
-    
-    # 默認回覆
-    else:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="我不太明白你的意思。請輸入「選單」來查看可用選項。")
-        )
-
-def show_main_menu(reply_token):
-    """顯示主選單"""
-    line_bot_api.reply_message(
-        reply_token,
-        TextSendMessage(
-            text="📰 歡迎使用 NewsLingo by Angelo！\n請選擇服務：",
-            quick_reply=QuickReply(items=[
-                QuickReplyButton(action=MessageAction(label="國外新聞", text="國外新聞(BBC)")),
-                QuickReplyButton(action=MessageAction(label="國內新聞", text="國內新聞")),
-                QuickReplyButton(action=MessageAction(label="多益閱讀題目", text="多益閱讀題目"))
-            ])
-        )
-    )
-
-def send_bbc_news(reply_token):
-    """發送 BBC 新聞"""
+# API 端點 - 處理來自網頁的請求
+@app.route("/api/message", methods=['POST'])
+def process_web_message():
+    """處理來自網頁的消息"""
     try:
-        logger.info("開始獲取 BBC 新聞...")
+        data = request.json
+        user_message = data.get('message', '').strip()
+        
+        if not user_message:
+            return jsonify({'error': '訊息不能為空'}), 400
+        
+        # 根據用戶消息執行相應操作
+        if user_message.lower() in ["help", "menu", "選單", "幫助", "hi", "hello", "嗨", "你好"]:
+            return jsonify({
+                'type': 'menu',
+                'title': '📰 歡迎使用 NewsLingo by Angelo！',
+                'options': [
+                    {'label': '國外新聞', 'value': '國外新聞(BBC)'},
+                    {'label': '國內新聞', 'value': '國內新聞'},
+                    {'label': '多益閱讀題目', 'value': '多益閱讀題目'}
+                ]
+            })
+        elif user_message.lower() in ["bbc", "國外新聞", "1", "國外新聞(bbc)"]:
+            return get_bbc_news_web()
+        elif user_message.lower() in ["國內新聞", "台灣新聞", "2"]:
+            return get_google_news_web()
+        elif user_message.lower() in ["多益", "toeic", "3", "多益閱讀題目"]:
+            return get_toeic_question_web()
+        else:
+            return jsonify({
+                'type': 'text',
+                'content': "我不太明白你的意思。請輸入「選單」來查看可用選項。"
+            })
+    except Exception as e:
+        logger.error(f"處理網頁請求時發生錯誤: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'處理請求時發生錯誤: {str(e)}'}), 500
+
+# 修改 get_bbc_news_web 函數中處理翻譯的部分
+
+def get_bbc_news_web():
+    """網頁版 BBC 新聞"""
+    try:
+        logger.info("開始獲取 BBC 新聞 (網頁版)...")
         start_time = time.time()
         
-        # 調用 BBC 爬蟲
         news = get_bbc_trending_news()
+        titles_to_translate = []
+        title_map = {}  # 用於儲存標題映射
         
-        # 格式化回覆訊息
-        news_text = "📰 BBC 熱門新聞：\n\n"
-        
-        # 添加 Most Read 新聞
+        most_read_items = []
         if news['most_read']:
-            news_text += "📚 最多閱讀：\n"
-            # 取前 5 個，或所有項目如果少於 5 個
             most_read_items = news['most_read'][:5] if len(news['most_read']) > 5 else news['most_read']
-            
-            for i, item in enumerate(most_read_items, 1):
-                # 移除標題中可能存在的編號
-                title = item['title']
-                # 檢查標題是否以數字和點開頭，如果是則去除
-                if title and title[0].isdigit() and len(title) > 1:
-                    # 找到第一個非數字字符的位置
-                    pos = 0
-                    while pos < len(title) and (title[pos].isdigit() or title[pos] in '. '):
-                        pos += 1
-                    title = title[pos:].strip()
-                    
-                # 添加標題和鏈接
-                news_text += f"{i}. {title}\n"
-                news_text += f"   {item['url']}\n\n"  # 添加連結並增加空行
+            for i, item in enumerate(most_read_items):
+                if item.get('title'):
+                    clean_title = item['title']
+                    # 如果有數字前綴，清除它
+                    if clean_title.strip().split(' ')[0].isdigit():
+                        clean_title = ' '.join(clean_title.strip().split(' ')[1:])
+                    titles_to_translate.append(clean_title)
+                    title_map[clean_title] = item['title']  # 保存映射
         
-        # 添加 Most Watched 新聞
+        most_watched_items = []
         if news['most_watched']:
-            news_text += "📺 最多觀看：\n"
             most_watched_items = news['most_watched'][:5] if len(news['most_watched']) > 5 else news['most_watched']
+            for i, item in enumerate(most_watched_items):
+                if item.get('title'):
+                    clean_title = item['title']
+                    # 如果有數字前綴，清除它
+                    if clean_title.strip().split(' ')[0].isdigit():
+                        clean_title = ' '.join(clean_title.strip().split(' ')[1:])
+                    titles_to_translate.append(clean_title)
+                    title_map[clean_title] = item['title']  # 保存映射
+        
+        # 批量翻譯標題
+        translations = {}
+        translation_time = 0
+        if titles_to_translate:
+            translation_start = time.time()
+            translations_result = translate_titles(titles_to_translate)
+            translation_time = time.time() - translation_start
             
-            for i, item in enumerate(most_watched_items, 1):
-                # 移除標題中可能存在的編號
-                title = item['title']
-                # 檢查標題是否以數字和點開頭，如果是則去除
-                if title and title[0].isdigit() and len(title) > 1:
-                    # 找到第一個非數字字符的位置
-                    pos = 0
-                    while pos < len(title) and (title[pos].isdigit() or title[pos] in '. '):
-                        pos += 1
-                    title = title[pos:].strip()
-                
-                # 添加標題和鏈接
-                news_text += f"{i}. {title}\n"
-                news_text += f"   {item['url']}\n\n"  # 添加連結並增加空行
+            # 將翻譯結果映射回原始標題
+            for clean_title, original_title in title_map.items():
+                if clean_title in translations_result:
+                    translations[original_title] = translations_result[clean_title]
         
-        # 添加執行時間資訊
+        # 格式化最多閱讀新聞
+        most_read_formatted = []
+        for item in most_read_items:
+            title = item.get('title', '')
+            url = item.get('url', '#')
+            translation = translations.get(title, '')
+            most_read_formatted.append({
+                'title': title,
+                'url': url,
+                'translation': translation
+            })
+        
+        # 格式化最多觀看新聞
+        most_watched_formatted = []
+        for item in most_watched_items:
+            title = item.get('title', '')
+            url = item.get('url', '#')
+            translation = translations.get(title, '')
+            most_watched_formatted.append({
+                'title': title,
+                'url': url,
+                'translation': translation
+            })
+        
+        # 計算執行時間
         elapsed = time.time() - start_time
-        news_text += f"(資料更新耗時: {elapsed:.1f}秒)"
         
-        # 檢查消息是否過長 (LINE 限制單條消息最多 5000 字元)
-        if len(news_text) > 5000:
-            news_text = news_text[:4900] + "...\n\n(消息過長，已截斷)"
-        
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=news_text)
-        )
-        
-        logger.info(f"BBC 新聞發送成功，耗時: {elapsed:.2f}秒")
+        return jsonify({
+            'type': 'bbc_news',
+            'most_read': most_read_formatted,
+            'most_watched': most_watched_formatted,
+            'elapsed': round(elapsed, 1),
+            'translation_time': round(translation_time, 1)
+        })
     except Exception as e:
         logger.error(f"獲取BBC新聞時出現錯誤: {str(e)}")
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=f"抱歉，獲取BBC新聞時出現錯誤：{str(e)}")
-        )
-        
-def send_google_news(reply_token):
-    """發送 Google News 台灣新聞"""
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'獲取BBC新聞時出現錯誤: {str(e)}'}), 500
+
+
+# 網頁版 Google News 台灣新聞
+def get_google_news_web():
+    """網頁版 Google News 台灣新聞"""
     try:
-        logger.info("開始獲取 Google News 台灣新聞...")
+        logger.info("開始獲取 Google News 台灣新聞 (網頁版)...")
         start_time = time.time()
         
-        # 調用 Google News 爬蟲
-        news_data = get_google_news_taiwan(max_news=10)  # 減少為10條提升效能
+        news_data = get_google_news_taiwan(max_news=10)
+        news_list = news_data.get('news', [])
         
         # 準備縮短網址
-        news_list = news_data.get('news', [])
+        shortened_urls = {}
         if news_list:
-            # 收集所有 URL
             urls_to_shorten = [item['url'] for item in news_list]
-            
-            # 並行縮短所有 URL
-            logger.info(f"開始縮短 {len(urls_to_shorten)} 個網址...")
-            url_shorten_start = time.time()
             shortened_urls = shorten_urls_in_parallel(urls_to_shorten)
-            url_shorten_time = time.time() - url_shorten_start
-            logger.info(f"網址縮短完成，耗時: {url_shorten_time:.2f}秒")
         
-        # 格式化回覆訊息
-        news_text = "📰 Google News 台灣熱門新聞：\n\n"
+        # 格式化新聞列表
+        formatted_news = []
+        for item in news_list:
+            title = item.get('title', '')
+            url = item.get('url', '#')
+            short_url = shortened_urls.get(url, url)
+            formatted_news.append({
+                'title': title,
+                'url': short_url
+            })
         
-        # 添加新聞
-        if news_list:
-            for i, item in enumerate(news_list, 1):
-                # 添加標題和鏈接
-                news_text += f"{i}. {item['title']}\n"
-                # 使用已縮短的網址
-                short_url = shortened_urls.get(item['url'], item['url'])
-                news_text += f"   {short_url}\n\n"
-        else:
-            news_text += "未找到任何新聞項目。\n"
-            
-        # 添加執行時間資訊
+        # 計算執行時間
         elapsed = time.time() - start_time
-        news_text += f"(資料更新耗時: {elapsed:.1f}秒)"
         
-        # 檢查消息是否過長 (LINE 限制單條消息最多 5000 字元)
-        if len(news_text) > 5000:
-            news_text = news_text[:4900] + "...\n\n(消息過長，已截斷)"
-        
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=news_text)
-        )
-        
-        logger.info(f"Google News 台灣新聞發送成功，耗時: {elapsed:.2f}秒")
+        return jsonify({
+            'type': 'google_news',
+            'news': formatted_news,
+            'elapsed': round(elapsed, 1)
+        })
     except Exception as e:
-        logger.error(f"獲取 Google News 台灣新聞時出現錯誤: {str(e)}")
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=f"抱歉，獲取台灣新聞時出現錯誤：{str(e)}")
-        )
+        logger.error(f"獲取Google新聞時出現錯誤: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'獲取Google新聞時出現錯誤: {str(e)}'}), 500
 
-def send_toeic_question(reply_token):
-    """發送多益閱讀題目"""
+# 網頁版多益閱讀題目
+def get_toeic_question_web():
+    """網頁版多益閱讀題目"""
     try:
-        logger.info("開始獲取多益閱讀題目...")
+        logger.info("開始獲取多益閱讀題目 (網頁版)...")
         start_time = time.time()
         
-        # 先獲取一篇隨機文章
-        article_response = get_random_toeic_article()
+        # 載入 JSON 檔案
+        with open('data/toeic_articles.json', 'r', encoding='utf-8') as file:
+            articles = json.load(file)
         
-        if "error" in article_response:
-            raise Exception(article_response["error"])
+        # 隨機選擇一篇文章
+        article = random.choice(articles)
         
-        article = article_response["article"]
+        # 格式化回傳資料
+        result = {
+            'type': 'toeic',
+            'title': article['title'],
+            'text': article['text'],
+            'questions': article['questions'],
+            'answers': article['answers'],
+            'vocabulary': article['vocabulary'],
+            'elapsed': round(time.time() - start_time, 1)
+        }
         
-        # 基於文章生成題目
-        question_response = generate_toeic_question(article)
-        
-        if "error" in question_response:
-            raise Exception(question_response["error"])
-        
-        toeic_text = question_response["result"]
-        
-        # 添加執行時間資訊
-        elapsed = time.time() - start_time
-        toeic_text += f"\n\n(題目生成耗時: {elapsed:.1f}秒)"
-        
-        # 檢查消息是否過長 (LINE 限制單條消息最多 5000 字元)
-        if len(toeic_text) > 5000:
-            toeic_text = toeic_text[:4900] + "...\n\n(消息過長，已截斷)"
-        
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=toeic_text)
-        )
-        
-        logger.info(f"多益題目發送成功，耗時: {elapsed:.2f}秒")
+        return jsonify(result)
     except Exception as e:
         logger.error(f"獲取多益題目時出現錯誤: {str(e)}")
-        line_bot_api.reply_message(
-            reply_token,
-            TextSendMessage(text=f"抱歉，獲取多益題目時出現錯誤：{str(e)}")
-        )
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'獲取多益題目時出現錯誤: {str(e)}'}), 500
+
+# 確保目錄存在的函數
+def ensure_directories_exist():
+    """確保必要的目錄結構存在"""
+    directories = [
+        os.path.join(os.path.dirname(__file__), 'templates'),
+        os.path.join(os.path.dirname(__file__), 'static'),
+        os.path.join(os.path.dirname(__file__), 'static', 'css'),
+        os.path.join(os.path.dirname(__file__), 'static', 'js')
+    ]
+    
+    for directory in directories:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+# 添加 ngrok 支持
+def setup_ngrok():
+    """設置 ngrok 隧道"""
+    try:
+        from pyngrok import ngrok
+        
+        # 啟動 ngrok 隧道
+        port = int(os.getenv('PORT', 5004))
+        public_url = ngrok.connect(port)
+        logger.info(f"* ngrok 隧道已建立: {public_url}")
+        print(f"\n✅ ngrok 隧道已建立!")
+        print(f"🌎 公開網址: {public_url}")
+        print(f"🖥️ 網頁介面: {public_url}/\n")
+        return True
+    except ImportError:
+        print("\n❌ 需要安裝 pyngrok 才能使用 ngrok 功能")
+        print("📦 請執行: pip install pyngrok")
+        return False
+    except Exception as e:
+        logger.error(f"啟動 ngrok 時出錯: {e}")
+        print(f"\n❌ 啟動 ngrok 時出錯: {e}")
+        return False
 
 if __name__ == "__main__":
-    # 在開發環境中使用
-    app.run(debug=True, host='0.0.0.0', port=5004)
+    # 確保目錄存在
+    ensure_directories_exist()
+    
+    # 檢查是否使用 ngrok
+    use_ngrok = os.getenv('USE_NGROK', 'false').lower() == 'true'
+    if use_ngrok:
+        setup_ngrok()
+    
+    # 啟動 Flask 應用
+    port = int(os.getenv('PORT', 5004))
+    app.run(debug=True, host='0.0.0.0', port=port)

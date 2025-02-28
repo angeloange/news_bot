@@ -1,0 +1,427 @@
+[
+    {
+      "id": 1,
+      "category": "business_email",
+      "title": "Health & Safety Protocols",
+      "text": "Subject: Important Updates to Health & Safety Protocols\n\nDear Team,\n\nWe are pleased to announce several important updates to our company's health and safety protocols. In our continuous effort to ensure a safe and healthy work environment, we have revised our guidelines to better protect our employees.\n\nFirstly, all office areas will now be equipped with additional hand sanitizing stations. This measure is part of our commitment to maintaining high standards of hygiene in the workplace.\n\nSecondly, the company will conduct monthly safety drills. These drills are designed to ensure that everyone is prepared in the event of an emergency and to reinforce our safety practices.\n\nLastly, we are introducing comprehensive ergonomic assessments for all employees. These assessments will be performed by our in-house health team to ensure that workstations are set up in a manner that minimizes the risk of injury and promotes overall well-being.\n\nWe ask that you read the updated protocols carefully and adhere to these new guidelines. Your cooperation is vital in making our workplace safer for everyone. Should you have any questions or require further information, please do not hesitate to contact your department manager.\n\nThank you for your attention and commitment to safety.\n\nBest regards,\n[Your Name]\n[Your Position]\n[Company Name]",
+      "difficulty": "intermediate",
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is the main purpose of this email?",
+          "options": {
+            "A": "To announce a new health insurance plan",
+            "B": "To inform about updates to health and safety protocols",
+            "C": "To request employee feedback on workplace safety",
+            "D": "To introduce a new Health & Safety Coordinator"
+          }
+        },
+        {
+          "id": 2,
+          "question": "What will be installed in office areas?",
+          "options": {
+            "A": "Security cameras",
+            "B": "New workstations",
+            "C": "Hand sanitizing stations",
+            "D": "Water coolers"
+          }
+        },
+        {
+          "id": 3,
+          "question": "How often will safety drills be conducted?",
+          "options": {
+            "A": "Weekly",
+            "B": "Monthly",
+            "C": "Quarterly",
+            "D": "Annually"
+          }
+        },
+        {
+          "id": 4,
+          "question": "Who will perform the ergonomic assessments?",
+          "options": {
+            "A": "External consultants",
+            "B": "Department managers",
+            "C": "The in-house health team",
+            "D": "The HR department"
+          }
+        }
+      ],
+      "answers": [
+        {
+          "question_id": 1,
+          "correct": "B",
+          "explanation": "答案為 B。文章開頭明確表示 'We are pleased to announce several important updates to our company's health and safety protocols'（我們很高興宣布公司健康與安全協議的幾項重要更新），表明這封電郵的主要目的是通知員工關於健康與安全協議的更新。"
+        },
+        {
+          "question_id": 2,
+          "correct": "C",
+          "explanation": "答案為 C。文章第二段指出 'all office areas will now be equipped with additional hand sanitizing stations'（所有辦公區域將配備額外的手部消毒站），明確說明將在辦公區域安裝的是手部消毒站。"
+        },
+        {
+          "question_id": 3,
+          "correct": "B",
+          "explanation": "答案為 B。文章第三段提到 'the company will conduct monthly safety drills'（公司將進行每月安全演習），因此安全演習的頻率是每月一次（monthly）。"
+        },
+        {
+          "question_id": 4,
+          "correct": "C",
+          "explanation": "答案為 C。文章最後一段指出 'These assessments will be performed by our in-house health team'（這些評估將由我們的內部健康團隊執行），說明人體工學評估將由公司內部的健康團隊執行。"
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "protocols",
+          "meaning": "規範、協議",
+          "context": "updates to our health and safety protocols"
+        },
+        {
+          "word": "ergonomics",
+          "meaning": "人體工學",
+          "context": "policy regarding workstation ergonomics"
+        }
+      ],
+      "added_date": "2025-02-28",
+      "last_updated": "2025-02-28"
+    },
+    {
+      "id": 2,
+      "category": "business_email",
+      "title": "Annual Performance Review Process",
+      "text": "Dear Team,\nAs we approach the end of the fiscal year, it's time to begin our annual performance review process. This process is crucial for recognizing achievements, setting goals, and identifying areas for development. All employees will be required to complete a self-assessment form, which will be followed by a meeting with their direct supervisor. The self-assessment forms must be submitted by October 15th. Supervisors will then schedule individual meetings to discuss performance and set objectives for the coming year. We encourage open and honest communication during these meetings to ensure a productive dialogue. Thank you for your cooperation in this important process.\nBest regards,\nHR Department",
+      "difficulty": "intermediate",
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is the primary purpose of the annual performance review process?",
+          "options": {
+            "A": "To announce promotions",
+            "B": "To recognize achievements, set goals, and identify development areas",
+            "C": "To discuss salary increases",
+            "D": "To introduce new company policies"
+          }
+        },
+        {
+          "id": 2,
+          "question": "By when must the self-assessment forms be submitted?",
+          "options": {
+            "A": "September 15th",
+            "B": "October 15th",
+            "C": "November 15th",
+            "D": "December 15th"
+          }
+        },
+        {
+          "id": 3,
+          "question": "Who will employees meet with to discuss their performance?",
+          "options": {
+            "A": "HR representatives",
+            "B": "Their direct supervisors",
+            "C": "The CEO",
+            "D": "Peers in their department"
+          }
+        },
+        {
+          "id": 4,
+          "question": "What is emphasized for the performance review meetings?",
+          "options": {
+            "A": "Strict time management",
+            "B": "Formal dress code",
+            "C": "Open and honest communication",
+            "D": "Written documentation only"
+          }
+        }
+      ],
+      "answers": [
+        {
+          "question_id": 1,
+          "correct": "B",
+          "explanation": "答案為 B。文章中明確說明這個流程是為了 'recognizing achievements, setting goals, and identifying areas for development'（認可成就、設定目標和確定發展領域），這與選項 B 完全吻合。"
+        },
+        {
+          "question_id": 2,
+          "correct": "B",
+          "explanation": "答案為 B。文章明確表示 'The self-assessment forms must be submitted by October 15th'（自我評估表必須在 10 月 15 日前提交），因此截止日期是 10 月 15 日。"
+        },
+        {
+          "question_id": 3,
+          "correct": "B",
+          "explanation": "答案為 B。文章提到員工需完成自我評估表，'which will be followed by a meeting with their direct supervisor'（之後將與直屬主管進行會面），表明員工將與其直屬主管討論績效。"
+        },
+        {
+          "question_id": 4,
+          "correct": "C",
+          "explanation": "答案為 C。文章強調 'We encourage open and honest communication during these meetings'（我們鼓勵在這些會議中進行開放和誠實的溝通），這與選項 C 相符。"
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "fiscal year",
+          "meaning": "會計年度",
+          "context": "As we approach the end of the fiscal year"
+        },
+        {
+          "word": "self-assessment",
+          "meaning": "自我評估",
+          "context": "complete a self-assessment form"
+        }
+      ],
+      "added_date": "2025-02-28",
+      "last_updated": "2025-02-28"
+    },
+    {
+      "id": 3,
+      "category": "business_email",
+      "title": "New Remote Work Policy",
+      "text": "Dear Colleagues,\nIn response to the evolving work environment, we are pleased to announce a new remote work policy effective January 1st. This policy allows eligible employees to work from home up to three days per week. To be eligible, employees must have completed their probationary period and have a satisfactory performance record. All remote work arrangements must be approved by the department manager. We believe this flexibility will enhance work-life balance and productivity. Please review the attached policy document for detailed guidelines.\nSincerely,\nManagement Team",
+      "difficulty": "intermediate",
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is the maximum number of days per week employees can work from home under the new policy?",
+          "options": {
+            "A": "One day",
+            "B": "Two days",
+            "C": "Three days",
+            "D": "Five days"
+          }
+        },
+        {
+          "id": 2,
+          "question": "When does the new remote work policy take effect?",
+          "options": {
+            "A": "Immediately",
+            "B": "January 1st",
+            "C": "March 1st",
+            "D": "June 1st"
+          }
+        },
+        {
+          "id": 3,
+          "question": "What is a requirement for eligibility to work remotely?",
+          "options": {
+            "A": "Being a new employee",
+            "B": "Having a private office",
+            "C": "Completing the probationary period",
+            "D": "Working overtime"
+          }
+        },
+        {
+          "id": 4,
+          "question": "Who must approve remote work arrangements?",
+          "options": {
+            "A": "HR department",
+            "B": "IT department",
+            "C": "Department manager",
+            "D": "CEO"
+          }
+        }
+      ],
+      "answers": [
+        {
+          "question_id": 1,
+          "correct": "C",
+          "explanation": "答案為 C。文章中提到 'This policy allows eligible employees to work from home up to three days per week'（此政策允許符合條件的員工每週最多在家工作三天），清楚指出每週最多可在家工作的天數是三天。"
+        },
+        {
+          "question_id": 2,
+          "correct": "B",
+          "explanation": "答案為 B。文章開頭明確說明此政策 'effective January 1st'（從 1 月 1 日起生效），因此新遠端工作政策將於 1 月 1 日開始實施。"
+        },
+        {
+          "question_id": 3,
+          "correct": "C",
+          "explanation": "答案為 C。文章指出符合資格的條件之一是 'employees must have completed their probationary period'（員工必須已完成試用期），這與選項 C 相符。"
+        },
+        {
+          "question_id": 4,
+          "correct": "C",
+          "explanation": "答案為 C。文章中明確表示 'All remote work arrangements must be approved by the department manager'（所有遠端工作安排必須經部門經理批准），因此部門經理是負責批准遠端工作安排的人。"
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "probationary period",
+          "meaning": "試用期",
+          "context": "completed their probationary period"
+        },
+        {
+          "word": "work-life balance",
+          "meaning": "工作與生活平衡",
+          "context": "enhance work-life balance and productivity"
+        }
+      ],
+      "added_date": "2025-02-28",
+      "last_updated": "2025-02-28"
+    },
+    {
+      "id": 4,
+      "category": "business_email",
+      "title": "Upcoming Team Building Event",
+      "text": "Dear Team,\nWe are excited to announce our annual team building event, which will take place on November 10th at the Green Valley Retreat Center. This year's theme is \"Collaboration and Innovation.\" The event will include workshops, group activities, and a keynote speech by renowned leadership expert Dr. Jane Smith. Attendance is mandatory for all employees, as this is a valuable opportunity to strengthen our team dynamics and foster creativity. Please RSVP by October 20th to confirm your participation. We look forward to a day of learning and fun!\nBest,\nEvent Planning Committee",
+      "difficulty": "intermediate",
+      "questions": [
+        {
+          "id": 1,
+          "question": "What is the theme of this year's team building event?",
+          "options": {
+            "A": "Leadership and Management",
+            "B": "Collaboration and Innovation",
+            "C": "Diversity and Inclusion",
+            "D": "Customer Service Excellence"
+          }
+        },
+        {
+          "id": 2,
+          "question": "Where will the team building event be held?",
+          "options": {
+            "A": "Company headquarters",
+            "B": "A local park",
+            "C": "Green Valley Retreat Center",
+            "D": "A beach resort"
+          }
+        },
+        {
+          "id": 3,
+          "question": "Who will give the keynote speech?",
+          "options": {
+            "A": "The CEO",
+            "B": "A department manager",
+            "C": "Dr. Jane Smith",
+            "D": "An employee representative"
+          }
+        },
+        {
+          "id": 4,
+          "question": "By when should employees RSVP for the event?",
+          "options": {
+            "A": "October 10th",
+            "B": "October 20th",
+            "C": "November 1st",
+            "D": "November 10th"
+          }
+        }
+      ],
+      "answers": [
+        {
+          "question_id": 1,
+          "correct": "B",
+          "explanation": "答案為 B。文章中明確指出 'This year's theme is \"Collaboration and Innovation\"'（今年的主題是「協作與創新」），這與選項 B 完全相符。"
+        },
+        {
+          "question_id": 2,
+          "correct": "C",
+          "explanation": "答案為 C。文章表示團隊建設活動 'will take place on November 10th at the Green Valley Retreat Center'（將於 11 月 10 日在綠谷休閒中心舉行），因此活動地點是綠谷休閒中心。"
+        },
+        {
+          "question_id": 3,
+          "correct": "C",
+          "explanation": "答案為 C。文章提到活動將包含 'a keynote speech by renowned leadership expert Dr. Jane Smith'（著名領導力專家簡·史密斯博士的主題演講），因此主題演講將由簡·史密斯博士進行。"
+        },
+        {
+          "question_id": 4,
+          "correct": "B",
+          "explanation": "答案為 B。文章要求員工 'Please RSVP by October 20th'（請在 10 月 20 日前回覆是否參加），因此回覆截止日期是 10 月 20 日。"
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "team dynamics",
+          "meaning": "團隊動態",
+          "context": "strengthen our team dynamics"
+        },
+        {
+          "word": "foster",
+          "meaning": "培養、促進",
+          "context": "foster creativity"
+        }
+      ],
+      "added_date": "2025-02-28",
+      "last_updated": "2025-02-28"
+    },
+    {
+      "id": 5,
+      "category": "business_email",
+      "title": "Changes to Employee Benefits",
+      "text": "Dear Employees,\nWe are writing to inform you of some changes to our employee benefits package, effective from the next quarter. After careful consideration, we have decided to enhance our health insurance coverage to include dental and vision care. Additionally, we are introducing a new wellness program that offers gym memberships and mental health resources. However, please note that there will be a slight increase in the employee contribution towards the health insurance premium. We believe these changes will provide greater support for your overall well-being. For more details, please attend the informational session on September 25th.\nRegards,\nBenefits Team",
+      "difficulty": "intermediate",
+      "questions": [
+        {
+          "id": 1,
+          "question": "What new additions are being made to the health insurance coverage?",
+          "options": {
+            "A": "Prescription drugs",
+            "B": "Dental and vision care",
+            "C": "Maternity leave",
+            "D": "Travel insurance"
+          }
+        },
+        {
+          "id": 2,
+          "question": "What is included in the new wellness program?",
+          "options": {
+            "A": "Free meals",
+            "B": "Gym memberships and mental health resources",
+            "C": "Extra vacation days",
+            "D": "Stock options"
+          }
+        },
+        {
+          "id": 3,
+          "question": "What change will affect employees' contributions?",
+          "options": {
+            "A": "A decrease in health insurance premiums",
+            "B": "No change in contributions",
+            "C": "A slight increase in health insurance premiums",
+            "D": "Contributions to the wellness program"
+          }
+        },
+        {
+          "id": 4,
+          "question": "When can employees learn more about these changes?",
+          "options": {
+            "A": "At the end of the year",
+            "B": "During the next team meeting",
+            "C": "At the informational session on September 25th",
+            "D": "By reading the employee handbook"
+          }
+        }
+      ],
+      "answers": [
+        {
+          "question_id": 1,
+          "correct": "B",
+          "explanation": "答案為 B。文章中說明 'we have decided to enhance our health insurance coverage to include dental and vision care'（我們已決定擴大健康保險範圍，納入牙科和視力護理），明確指出健康保險新增的部分是牙科和視力護理。"
+        },
+        {
+          "question_id": 2,
+          "correct": "B",
+          "explanation": "答案為 B。文章提到新的健康計劃 'offers gym memberships and mental health resources'（提供健身房會員資格和心理健康資源），這與選項 B 中提到的內容相符。"
+        },
+        {
+          "question_id": 3,
+          "correct": "C",
+          "explanation": "答案為 C。文章警告 'there will be a slight increase in the employee contribution towards the health insurance premium'（員工對健康保險費用的貢獻將略有增加），表明員工需要支付略高的健康保險費用。"
+        },
+        {
+          "question_id": 4,
+          "correct": "C",
+          "explanation": "答案為 C。文章結尾指出 'For more details, please attend the informational session on September 25th'（如需了解更多詳情，請參加 9 月 25 日的信息說明會），因此員工可以在 9 月 25 日的說明會上了解更多關於這些變更的內容。"
+        }
+      ],
+      "vocabulary": [
+        {
+          "word": "premium",
+          "meaning": "保費",
+          "context": "health insurance premium"
+        },
+        {
+          "word": "well-being",
+          "meaning": "福祉、健康",
+          "context": "support for your overall well-being"
+        }
+      ],
+      "added_date": "2025-02-28",
+      "last_updated": "2025-02-28"
+    }
+  ]

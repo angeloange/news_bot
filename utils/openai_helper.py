@@ -5,7 +5,7 @@ import time
 import openai
 from openai import OpenAI
 from dotenv import load_dotenv
-
+import traceback
 load_dotenv()
 logger = logging.getLogger(__name__)
 
@@ -126,3 +126,100 @@ def get_random_toeic_article():
         return {
             "error": str(e)
         }
+
+
+import json
+
+# 修改 translate_titles 函數
+
+def translate_titles(titles):
+    """批量將英文標題翻譯成中文"""
+    if not titles or len(titles) == 0:
+        return {}
+    
+    try:
+        logger.info(f"開始批量翻譯 {len(titles)} 個標題...")
+        start_time = time.time()
+        
+        # 去重並保持順序
+        unique_titles = []
+        seen = set()
+        for title in titles:
+            if title not in seen:
+                unique_titles.append(title)
+                seen.add(title)
+        
+        # 創建系統提示詞
+        system_prompt = """
+        你是一個專業的新聞標題翻譯員。請將以下英文新聞標題翻譯成中文。
+        保持翻譯簡潔、準確，並符合中文新聞標題的風格。
+        返回的結果應為 JSON 格式，鍵為原始英文標題，值為中文翻譯。
+        """
+        
+        # 創建用戶提示詞，包含所有需要翻譯的標題
+        user_prompt = "請將以下英文新聞標題翻譯成中文:\n\n"
+        for i, title in enumerate(unique_titles):
+            if title:
+                # 清理標題中可能的編號
+                clean_title = title
+                if clean_title.strip().split(' ')[0].isdigit():
+                    clean_title = ' '.join(clean_title.strip().split(' ')[1:])
+                user_prompt += f"{i+1}. {clean_title}\n"
+        
+        user_prompt += "\n請以JSON格式返回翻譯結果，英文標題為鍵，中文翻譯為值。不要包含編號。"
+        
+        # 發送請求到 OpenAI
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # 使用較輕量的模型以節省成本
+            response_format={"type": "json_object"},
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1500
+        )
+        
+        # 解析回應
+        content = response.choices[0].message.content
+        try:
+            result = json.loads(content)
+            
+            # 確保所有標題都有對應的翻譯
+            translations = {}
+            for title in titles:
+                clean_title = title
+                if clean_title.strip().split(' ')[0].isdigit():
+                    clean_title = ' '.join(clean_title.strip().split(' ')[1:])
+                
+                # 嘗試找到對應的翻譯
+                if clean_title in result:
+                    translations[title] = result[clean_title]
+                else:
+                    # 如果找不到，嘗試模糊匹配
+                    matched = False
+                    for k, v in result.items():
+                        if clean_title.lower() in k.lower() or k.lower() in clean_title.lower():
+                            translations[title] = v
+                            matched = True
+                            break
+                    
+                    if not matched:
+                        translations[title] = ""
+            
+            # 記錄執行時間
+            elapsed = time.time() - start_time
+            logger.info(f"標題翻譯完成，耗時: {elapsed:.2f}秒")
+            
+            return translations
+            
+        except json.JSONDecodeError:
+            logger.error("無法解析 OpenAI 返回的 JSON")
+            logger.error(f"原始內容: {content}")
+            return {}
+        
+    except Exception as e:
+        logger.error(f"翻譯標題時發生錯誤: {str(e)}")
+        logger.error(f"錯誤詳情: {traceback.format_exc()}")
+        return {}
+
