@@ -12,7 +12,8 @@ function cleanTitle(title) {
     return title;
 }
 
-// 渲染 BBC 新聞
+// 簡化 renderBBCNews 函數
+
 function renderBBCNews(data) {
     let html = `<div class="news-section"><h3>📰 BBC 熱門新聞</h3>`;
     
@@ -20,12 +21,9 @@ function renderBBCNews(data) {
     if (data.most_read && data.most_read.length > 0) {
         html += `<h4>📚 最多閱讀：</h4><div class="news-list">`;
         
-        data.most_read.forEach((item, index) => {
-            // 清理標題，移除數字前綴
-            const title = cleanTitle(item.title);
-            
+        data.most_read.forEach((item) => {
             html += `<div class="news-item">
-                <div class="news-title">${title}</div>`; // 移除 ${index + 1}.
+                <div class="news-title">${item.title}</div>`;
             
             if (item.translation) {
                 html += `<div class="news-translation">【${item.translation}】</div>`;
@@ -42,12 +40,9 @@ function renderBBCNews(data) {
     if (data.most_watched && data.most_watched.length > 0) {
         html += `<h4>📺 最多觀看：</h4><div class="news-list">`;
         
-        data.most_watched.forEach((item, index) => {
-            // 清理標題，移除數字前綴
-            const title = cleanTitle(item.title);
-            
+        data.most_watched.forEach((item) => {
             html += `<div class="news-item">
-                <div class="news-title">${title}</div>`; // 移除 ${index + 1}.
+                <div class="news-title">${item.title}</div>`;
             
             if (item.translation) {
                 html += `<div class="news-translation">【${item.translation}】</div>`;

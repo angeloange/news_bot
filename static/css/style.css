@@ -363,6 +363,44 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* 添加加載指示器的樣式 */
+
+.loading-message {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.loading-spinner {
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(67, 97, 238, 0.2);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spinner 1s ease-in-out infinite;
+}
+
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+.loading-joke {
+    font-size: 0.95rem;
+    color: var(--text);
+    animation: fadePulse 2s ease-in-out infinite;
+}
+
+@keyframes fadePulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
 /* 響應式設計 */
 @media (max-width: 768px) {
     .container {

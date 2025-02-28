@@ -18,7 +18,7 @@ load_dotenv()
 # 配置日誌
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levellevel)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
@@ -168,7 +168,6 @@ def get_google_news_web():
     try:
         logger.info("開始獲取 Google News 台灣新聞 (網頁版)...")
         start_time = time.time()
-        
         news_data = get_google_news_taiwan(max_news=10)
         news_list = news_data.get('news', [])
         
@@ -269,6 +268,31 @@ def setup_ngrok():
         logger.error(f"啟動 ngrok 時出錯: {e}")
         print(f"\n❌ 啟動 ngrok 時出錯: {e}")
         return False
+
+# 添加爛梗 API 路由
+
+@app.route("/data/jokes", methods=['GET'])
+def get_jokes():
+    """提供爛梗數據"""
+    try:
+        # 嘗試讀取爛梗 JSON 文件
+        try:
+            with open('data/jokes.json', 'r', encoding='utf-8') as file:
+                jokes = json.load(file)
+                return jsonify(jokes)
+        except FileNotFoundError:
+            # 如果文件不存在，返回默認爛梗
+            default_jokes = [
+                "正在努力讀取新聞，請稍候...",
+                "新聞比想像中難找，再等一下下...",
+                "翻譯中...我的英文勉勉強強啦",
+                "資料處理中，CPU 快燒起來了...",
+                "請稍等，正在思考人生的意義..."
+            ]
+            return jsonify(default_jokes)
+    except Exception as e:
+        logger.error(f"獲取爛梗時出現錯誤: {str(e)}")
+        return jsonify(["正在處理中，請稍候..."]), 500
 
 if __name__ == "__main__":
     # 確保目錄存在

@@ -6,6 +6,16 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def clean_title(title):
+    """移除標題中的數字前綴"""
+    if not title:
+        return ""
+    
+    # 檢查標題是否以數字開頭，後面跟著空格
+    import re
+    title_clean = re.sub(r'^\d+\s+', '', title)
+    return title_clean
+
 def get_bbc_trending_news():
     """獲取BBC新聞網站的熱門新聞"""
     start_time = time.time()
@@ -52,12 +62,18 @@ def get_bbc_trending_news():
             # 爬取 Most watched - 使用與原始代碼相同的邏輯
             most_watched = _extract_section_playwright(page, "Most watched")
             if most_watched:
+                for item in most_watched:
+                    if 'title' in item:
+                        item['title'] = clean_title(item['title'])
                 trending_news['most_watched'] = most_watched
                 logger.info(f"成功獲取 {len(most_watched)} 個 Most watched 項目")
             
             # 爬取 Most read - 使用與原始代碼相同的邏輯
             most_read = _extract_section_playwright(page, "Most read")
             if most_read:
+                for item in most_read:
+                    if 'title' in item:
+                        item['title'] = clean_title(item['title'])
                 trending_news['most_read'] = most_read
                 logger.info(f"成功獲取 {len(most_read)} 個 Most read 項目")
             
