@@ -10,6 +10,7 @@ import logging
 import time
 from dotenv import load_dotenv
 from utils.url_shortener import shorten_url, shorten_urls_in_parallel
+from utils.openai_helper import generate_toeic_question, get_random_toeic_article
 
 
 load_dotenv()
@@ -73,11 +74,8 @@ def handle_message(event):
         send_google_news(event.reply_token)
     
     # 處理多益閱讀請求 (未實現)
-    elif user_message.lower() in ["多益", "toeic", "3"]:
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="多益閱讀題目功能即將推出，敬請期待！")
-        )
+    elif user_message.lower() in ["多益", "toeic", "3","多益閱讀題目"]:
+        send_toeic_question(event.reply_token)
     
     # 默認回覆
     else:
@@ -91,11 +89,11 @@ def show_main_menu(reply_token):
     line_bot_api.reply_message(
         reply_token,
         TextSendMessage(
-            text="📰 歡迎使用 NewsCoach by Angelo！\n請選擇服務：",
+            text="📰 歡迎使用 NewsLingo by Angelo！\n請選擇服務：",
             quick_reply=QuickReply(items=[
                 QuickReplyButton(action=MessageAction(label="國外新聞", text="國外新聞(BBC)")),
                 QuickReplyButton(action=MessageAction(label="國內新聞", text="國內新聞")),
-                QuickReplyButton(action=MessageAction(label="多益閱讀題目", text="多益"))
+                QuickReplyButton(action=MessageAction(label="多益閱讀題目", text="多益閱讀題目"))
             ])
         )
     )
@@ -229,6 +227,49 @@ def send_google_news(reply_token):
         line_bot_api.reply_message(
             reply_token,
             TextSendMessage(text=f"抱歉，獲取台灣新聞時出現錯誤：{str(e)}")
+        )
+
+def send_toeic_question(reply_token):
+    """發送多益閱讀題目"""
+    try:
+        logger.info("開始獲取多益閱讀題目...")
+        start_time = time.time()
+        
+        # 先獲取一篇隨機文章
+        article_response = get_random_toeic_article()
+        
+        if "error" in article_response:
+            raise Exception(article_response["error"])
+        
+        article = article_response["article"]
+        
+        # 基於文章生成題目
+        question_response = generate_toeic_question(article)
+        
+        if "error" in question_response:
+            raise Exception(question_response["error"])
+        
+        toeic_text = question_response["result"]
+        
+        # 添加執行時間資訊
+        elapsed = time.time() - start_time
+        toeic_text += f"\n\n(題目生成耗時: {elapsed:.1f}秒)"
+        
+        # 檢查消息是否過長 (LINE 限制單條消息最多 5000 字元)
+        if len(toeic_text) > 5000:
+            toeic_text = toeic_text[:4900] + "...\n\n(消息過長，已截斷)"
+        
+        line_bot_api.reply_message(
+            reply_token,
+            TextSendMessage(text=toeic_text)
+        )
+        
+        logger.info(f"多益題目發送成功，耗時: {elapsed:.2f}秒")
+    except Exception as e:
+        logger.error(f"獲取多益題目時出現錯誤: {str(e)}")
+        line_bot_api.reply_message(
+            reply_token,
+            TextSendMessage(text=f"抱歉，獲取多益題目時出現錯誤：{str(e)}")
         )
 
 if __name__ == "__main__":
